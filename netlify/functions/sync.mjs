@@ -1,6 +1,7 @@
 import {snapshot,store,reportKey} from '../../lib/store.mjs';
 import {syncLeague,eastern,reportDue} from '../../lib/engine.mjs';
 import {buildReport} from '../../lib/report.mjs';
+import {specialPlans,buildSpecial,specialKey} from '../../lib/specials.mjs';
 export default async ()=>{
  const now=new Date(),local=eastern(now),s=store();
  try{
@@ -22,6 +23,14 @@ export default async ()=>{
     }
    }
   }
+  // Reuse the existing sync schedule; immutable per-season/draft special-edition keys.
+  const plans=specialPlans(next,now);
+  const existing=plans.length?new Set((await s.list({prefix:'reports/special-'})).blobs.map(b=>b.key)):new Set();
+  for(const plan of plans){
+   const key=specialKey(plan.id);if(existing.has(key))continue;
+   try{await s.set(key,buildSpecial(next,plan,now),{onlyIfNew:true});console.log('Published special '+plan.id);}catch(e){console.error('Special edition '+plan.id+' deferred',e);}
+  }
+  console.log('Synced '+active+' Week '+final);
   return new Response('Synced '+active+' Week '+final);
  }catch(err){console.error('FDL sync/report failed',err);await s.setJSON('status',{ok:false,checkedAt:now.toISOString(),error:String(err.message).slice(0,400)}).catch(()=>{});throw err;}
 };

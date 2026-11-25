@@ -1,0 +1,24 @@
+# FDL HQ 2.1 — annual special editions upgrade
+
+For the existing `fredco-dynasty2024` site and `tfitzpatrick-shoough/FredCo-Dynasty` repository. This is an **incremental update**, not a new website. Keep the existing Netlify site, current settings, `netlify.toml`, dependencies, all other existing source files and Netlify Blobs. No separate schedule or service is needed. Existing weekly reports and historical PDFs remain untouched.
+
+## Install once
+
+1. Extract the ZIP on your computer. Open the extracted folder. You should see `lib`, `netlify`, `public`, `tests`, `package.json` and this instruction file.
+2. Go to https://github.com/tfitzpatrick-shoough/FredCo-Dynasty/upload/main. Drag ALL the contents of the extracted folder into the upload area (not the ZIP and not the outer folder). Keep folder structure. Commit directly to `main` with a message such as `Add annual special editions`. Existing files at the same paths are intentionally updated; all other files stay in place.
+3. Your existing Netlify project automatically builds and publishes the commit. Do not create another project or change settings. The same five functions remain; the existing `sync` job drives both weekly and special reports.
+4. Verify the new production deploy is green. Visit https://fredco-dynasty2024.netlify.app/ and open Newsroom. The Annual special editions section should appear. It will be empty until an edition is due. Data & Rules shows the new publication schedule. Run sync once if desired, then check logs for `Synced ... Week ...`. A manual sync does not publish an edition early.
+5. There is no need to run Netlify AI agents. This upgrade requires one normal production deployment; usage/credits still apply. Do not remove or reset the existing Blob store.
+
+## Editorial calendar (America/New_York)
+
+- Championship Annual: at 8 AM on the first Sunday strictly after Week 17 is first verified complete with the official champion; if verification is unusually late, the Sunday shifts accordingly. Begins with the 2026 season. All 12 teams, championship score, playoffs, awards, final standings, and draft retrospective.
+- Offseason Blueprint: 8 AM on the following Sunday, separate edition with roster-depth gaps, two actionable priorities for each franchise, competitive direction, next-season picks. Uses matching renewed roster if available, otherwise the last verified final roster. Begins after the 2026 championship.
+- Draft Report Card: 8 AM Eastern on the calendar day after the completed draft. From 2027 onward; one edition for each verified completed draft ID. Uses the official final pick timestamp or first observed completion when timestamp unavailable. The complete pick board is verified against draft team/round counts and owner IDs. If every selection has zero prior NFL experience recorded, the title explicitly says Rookie Draft Report Card; otherwise labeled supplemental draft. Fit grades are based on roster construction, not external prospect scouting, ADP, or predicted careers. Teams without picks receive N/A.
+- Season Preview: 8 AM the Sunday strictly before the regular-season kickoff date supplied by Sleeper's NFL state endpoint, from 2027 onward. Requires renewed league and a verified same-year date. If the date is missing or stale, the function will not invent a date. If the publication window is missed entirely, it skips the preview rather than publishing a preseason forecast after kickoff. Preview ranks returning production, prior power and active depth; Week 1 matchups only when available.
+
+EST/EDT handled with America/New_York. Sync is best-effort every 15 minutes in-season and hourly in the offseason; missed eligible editions retry on the next valid sync. Weekday reports remain unchanged. Annual, blueprint and draft editions have immutable season/draft keys; publication retries do not overwrite existing editions. The article listing uses the existing reports store; reports appear in Newsroom and can be printed/saved as PDF or downloaded as HTML. These are statistical editorial templates with opinions labeled, not an external AI writing service. No paid AI key, extra scheduled function, or new site is required. Netlify execution, Blob storage and bandwidth still count toward applicable plan limits.
+
+## Validation and limits
+
+12 unit tests passed (seven existing regression tests and five added special-edition tests for EST/EDT timing, no premature release, incomplete drafts, missing kickoff date, stable IDs and all four report templates). Node function/browser-script syntax checked. Chromium with mocked API data verified the special-edition cards and links; mobile viewport had no horizontal overflow. Real production storage, Sleeper's future schedule/draft responses and actual milestone timing have not yet been verified. The first live editions are the definitive test. No production website changes are made by merely downloading this package.
